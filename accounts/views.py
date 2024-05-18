@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import UserRegisterSerializer
+from .serializers import UserRegisterSerializer, ResetPasswordConfirmInputSerializer, ChangePasswordInputSerializer
 from .tokens import account_activation_token
 
 User = get_user_model()
@@ -112,15 +112,6 @@ class ResetPasswordConfirmView(APIView):
     authentication_classes = ()
     permission_classes = ()
 
-    class ResetPasswordConfirmInputSerializer(serializers.Serializer):
-        password = serializers.CharField()
-        password2 = serializers.CharField()
-
-        def validate(self, data):
-            if data['password'] != data.get('password2'):
-                raise serializers.ValidationError({'password': 'Passwords do not match.'})
-            return data
-
     @extend_schema(request=ResetPasswordConfirmInputSerializer)
     def post(self, request, uidb64, token):
         serializer = self.ResetPasswordConfirmInputSerializer(data=request.data)
@@ -135,15 +126,6 @@ class ResetPasswordConfirmView(APIView):
 
 
 class ChangePasswordView(APIView):
-    class ChangePasswordInputSerializer(serializers.Serializer):
-        old_password = serializers.CharField()
-        new_password = serializers.CharField()
-        new_password2 = serializers.CharField()
-
-        def validate(self, data):
-            if data['new_password'] != data.get('new_password2'):
-                raise serializers.ValidationError({'new_password': 'Passwords do not match.'})
-            return data
 
     @extend_schema(request=ChangePasswordInputSerializer)
     def post(self, request):
