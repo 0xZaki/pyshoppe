@@ -19,6 +19,7 @@ User = get_user_model()
 
 class RegisterView(APIView):
     authentication_classes = ()
+    permission_classes = ()
 
     @extend_schema(request=UserRegisterSerializer, responses={201: UserRegisterSerializer})
     def post(self, request, *args, **kwargs):
@@ -44,6 +45,7 @@ class RegisterView(APIView):
 
 class ActivateAccountView(APIView):
     authentication_classes = ()
+    permission_classes = ()
 
     def get(self, request, uidb64, token):
         try:
@@ -63,6 +65,7 @@ class ActivateAccountView(APIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     authentication_classes = ()
+    permission_classes = ()
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -74,6 +77,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
 class ResetPasswordView(APIView):
     authentication_classes = ()
+    permission_classes = ()
 
     class ResetPasswordInputSerializer(serializers.Serializer):
         email = serializers.EmailField()
@@ -106,6 +110,7 @@ class ResetPasswordView(APIView):
 
 class ResetPasswordConfirmView(APIView):
     authentication_classes = ()
+    permission_classes = ()
 
     class ResetPasswordConfirmInputSerializer(serializers.Serializer):
         password = serializers.CharField()
