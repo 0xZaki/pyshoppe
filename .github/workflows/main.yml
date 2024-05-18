@@ -46,10 +46,10 @@ jobs:
     needs: test
     steps:
       - name: Checkout code
-      - uses: actions/checkout@v2
+        uses: actions/checkout@v2
 
       - name: Clone repository
-      - run: git clone
+        run: git clone
 
       - name: create file named xd
-      - run: touch xd
+        run: touch xd
