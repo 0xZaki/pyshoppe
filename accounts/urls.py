@@ -20,10 +20,10 @@ urlpatterns = [
     path('accounts/activate/<uidb64>/<token>/', ActivateAccountView.as_view(), name='activate'),
 
     # Password Reset Endpoints
-    path('api/accounts/reset-password/', ResetPasswordView.as_view(), name='reset-password'),
+    path('api/accounts/reset-password/', ResetPasswordView.as_view(), name='reset_password'),
     path('accounts/reset-password/confirm/<uidb64>/<token>/', ResetPasswordConfirmView.as_view(),
-         name='reset-password-confirm'),
+         name='reset_password_confirm'),
 
     # Password Change Endpoint
-    path('api/accounts/change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('api/accounts/change-password/', ChangePasswordView.as_view(), name='change_password'),
 ]

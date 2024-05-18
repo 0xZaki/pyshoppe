@@ -114,7 +114,7 @@ class ResetPasswordConfirmView(APIView):
 
     @extend_schema(request=ResetPasswordConfirmInputSerializer)
     def post(self, request, uidb64, token):
-        serializer = self.ResetPasswordConfirmInputSerializer(data=request.data)
+        serializer = ResetPasswordConfirmInputSerializer(data=request.data)
         if serializer.is_valid():
             uid = force_str(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=uid)
@@ -129,7 +129,7 @@ class ChangePasswordView(APIView):
 
     @extend_schema(request=ChangePasswordInputSerializer)
     def post(self, request):
-        serializer = self.ChangePasswordInputSerializer(data=request.data)
+        serializer = ChangePasswordInputSerializer(data=request.data)
         if serializer.is_valid():
             user = request.user
             if user.check_password(serializer.validated_data['old_password']):
