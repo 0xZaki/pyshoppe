@@ -22,5 +22,8 @@ jobs:
       - name: Pull code
         run: cd /home/ubuntu/app/pyshoppe && git checkout test && git pull
 
+      - name: stop docker-compose
+        run: cd /home/ubuntu/app/pyshoppe && docker compose -f docker-compose.yml down
+
       - name: run docker-compose
         run: cd /home/ubuntu/app/pyshoppe && docker compose -f docker-compose.yml up --build -d
