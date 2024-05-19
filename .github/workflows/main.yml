@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Pull code
-        run: cd /home/ubuntu/app/pyshoppe && git pull
+        run: cd /home/ubuntu/app/pyshoppe && git checkout test && git pull
 
       - name: run docker-compose
         run: cd /home/ubuntu/app/pyshoppe && docker-compose up -d
