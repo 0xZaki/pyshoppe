@@ -23,4 +23,4 @@ jobs:
         run: cd /home/ubuntu/app/pyshoppe && git checkout test && git pull
 
       - name: run docker-compose
-        run: cd /home/ubuntu/app/pyshoppe && docker-compose up -d
+        run: cd /home/ubuntu/app/pyshoppe && docker compose -f docker-compose.yml up --build -d
