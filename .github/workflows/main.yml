@@ -28,3 +28,4 @@ jobs:
       - name: run docker-compose
         run: cd /home/ubuntu/app/pyshoppe && docker compose -f docker-compose.prod.yml up --build -d
 
+
