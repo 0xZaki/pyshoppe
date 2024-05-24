@@ -1,3 +1,6 @@
+from urllib.parse import urlencode
+
+import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
@@ -9,8 +12,10 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from accounts.utils import get_state, validate_state
 from .serializers import UserRegisterSerializer, ResetPasswordConfirmInputSerializer, ChangePasswordInputSerializer
 from .tokens import account_activation_token
 
@@ -138,3 +143,59 @@ class ChangePasswordView(APIView):
                 return Response({'detail': 'Your password has been successfully changed.'})
             return Response({'detail': 'Invalid old password.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class GoogleLoginView(APIView):
+    authentication_classes = ()
+    permission_classes = ()
+
+    class GoogleLoginInputSerializer(serializers.Serializer):
+        code = serializers.CharField()
+        state = serializers.CharField()
+
+    def get(self, request):
+        params = {
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "redirect_uri": 'http://localhost:8000/accounts/google/callback/',  # TODO: Change this to your frontend URL
+            "response_type": "code",
+            "scope": "email profile",
+            "state": get_state(),
+        }
+        redirect_url = f"{settings.GOOGLE_AUTH_URL}?{urlencode(params)}"
+        return Response({'redirect_url': redirect_url})
+
+    @extend_schema(request=GoogleLoginInputSerializer)
+    def post(self, request):
+        serializer = self.GoogleLoginInputSerializer(data=request.data)
+        if serializer.is_valid():
+            code = serializer.validated_data['code']
+            state = serializer.validated_data['state']
+            if not validate_state(state):
+                return Response({'detail': 'Invalid state parameter'}, status=status.HTTP_400_BAD_REQUEST)
+            token_url = "https://oauth2.googleapis.com/token"
+            data = {
+                "client_id": settings.GOOGLE_CLIENT_ID,
+                "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                # TODO: Change this to your frontend URL
+                "redirect_uri": 'http://localhost:8000/accounts/google/callback/',
+                "code": code,
+                "grant_type": "authorization_code",
+            }
+            response = requests.post(token_url, data=data)
+            token_data = response.json()
+            access_token = token_data.get("access_token")
+            if access_token:
+                user_info_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+                headers = {"Authorization": f"Bearer {access_token}"}
+                user_info_response = requests.get(user_info_url, headers=headers)
+                user_info = user_info_response.json()
+                user, created = User.objects.get_or_create(email=user_info['email'])
+                if created:
+                    user.first_name = user_info['given_name']
+                    user.last_name = user_info['family_name']
+                    user.save()
+
+                return Response(
+                    {'access': str(AccessToken.for_user(user)), 'refresh': str(RefreshToken.for_user(user))})
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

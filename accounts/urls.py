@@ -7,7 +7,8 @@ from .views import (
     CustomTokenObtainPairView,
     ResetPasswordView,
     ResetPasswordConfirmView,
-    ChangePasswordView
+    ChangePasswordView,
+    GoogleLoginView
 )
 
 urlpatterns = [
@@ -26,4 +27,7 @@ urlpatterns = [
 
     # Password Change Endpoint
     path('api/accounts/change-password/', ChangePasswordView.as_view(), name='change_password'),
+
+    # Google OAuth2
+    path('api/accounts/google/', GoogleLoginView.as_view(), name='google_login'),
 ]
